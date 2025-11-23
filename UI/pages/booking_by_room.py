@@ -1,74 +1,64 @@
 import customtkinter as ctk
-import tkinter as tk
 import tkcalendar
 import datetime
 from UI.components.clear_contents import clear_contents
 from UI.pages.booking_submit import select_time_slot
-from UI.components.theme import apply_datepicker_theme
+from UI.components.theme import apply_calendar_theme
 
-# Reimplemented https://pythonguides.com/create-date-time-picker-using-python-tkinter in customtkinter
 @clear_contents
 def show_booking_room(app):
     ctk.CTkLabel(app, text="Room Booking", font=("Arial", 18, "bold")).pack(pady=20)
-    ctk.CTkLabel(app, text="Please select a date:").pack(pady=(0, 10))
+    ctk.CTkLabel(app, text="Please select a room:").pack(pady=(0,10))
+    # TODO: Populate with available rooms from backend
+    app.room_select = ctk.CTkOptionMenu(
+        app,
+        values=["Select a room"] + app.rooms,
+        width=200,
+        command=lambda value: on_room_selected(app, value)
+    )
+    app.room_select.pack(pady=(0,20))
+    app.room_select.set("Select a room")
 
-    app.date_picker = tkcalendar.DateEntry(app)
-    apply_datepicker_theme(app)
-    app.date_picker.pack(pady=(0, 20))
-    ctk.CTkLabel(app, text="Select Time:", font=("Arial", 14)).pack(pady=(10, 5))
+    app.calander = tkcalendar.Calendar(app, selectmode='day', mindate=datetime.date.today(), font=("Arial", 14))
+    app.calander.selection_set(date=datetime.date.today())
+    app.calander.config(state="disabled")
 
-    time_frame = ctk.CTkFrame(app, fg_color="transparent")
-    time_frame.pack(pady=5)
+def on_room_selected(app, value):
+    if value != "Select a room":
+        app.calander.place(relx=0.5, rely=0.5, anchor="e")
+        app.calander.config(state="normal") 
+        app.calander.bind("<<CalendarSelected>>", lambda ev, cal=app.calander: on_calendar_selected(app, ev, cal))
+        apply_calendar_theme(app)
+        if hasattr(app, 'time_slots_frame') and app.time_slots_frame is not None:
+            app.time_slots_frame.destroy()     
+        app.time_slots_frame = ctk.CTkFrame(app, width=200, height=300)
+        app.time_slots_frame.place(relx=0.5, rely=0.5, anchor="w")
+        show_time_slots_for_date(app, value, datetime.date.today())
 
-    hour_var = tk.StringVar(value="12")
-    minute_var = tk.StringVar(value="00")
-    ampm_var = ctk.StringVar(value="AM")
-
-    app.hour_spin = ctk.CTkComboBox(time_frame, values=[f"{h}" for h in range(1, 13)])
-
-    app.hour_spin.pack(side="left", padx=(0, 5))
-
-    ctk.CTkLabel(time_frame, text=":", font=("Arial", 14)).pack(side="left")
-
-    app.minute_spin = ctk.CTkComboBox(time_frame, values=[f"{m:02d}" for m in range(0, 60, 15)])
-    app.minute_spin.pack(side="left", padx=(5, 0))
-
-    ampm_menu = ctk.CTkOptionMenu(time_frame, values=["AM", "PM"], variable=ampm_var, width=70)
-    ampm_menu.pack(side="left", padx=(10, 0))
-
-    ctk.CTkButton(app, text="Search")
-
-    ctk.CTkLabel(app, text="Select a Room:", font=("Arial", 14)).pack(pady=(20, 5))
-
-    rooms_frame = ctk.CTkScrollableFrame(app, width=450, height=300)
-    rooms_frame.pack(pady=10)
-
-    def handle_room_click(selected_room):
-
-        date = app.date_picker.get_date()
-
-        hour = int(hour_var.get())
-        minute = int(minute_var.get())
-        ampm = ampm_var.get()
-
-        if ampm == "PM" and hour != 12:
-            hour += 12
-        if ampm == "AM" and hour == 12:
-            hour = 0
-
-        slot_text = f"{hour:02d}:{minute:02d}"
-        select_time_slot(app, "date", date, slot_text, selected_room)
+def on_calendar_selected(app, event, cal_widget):
+    try:
+        selected_date = cal_widget.selection_get()
+        selected_room = app.room_select.get()
+    except Exception:
+        selected_date = datetime.date.today()
+    show_time_slots_for_date(app, selected_room, selected_date)
 
 
-    for room in app.rooms:
-        frame = ctk.CTkFrame(rooms_frame)
-        frame.pack(fill="x", padx=10, pady=10)
+def show_time_slots_for_date(app, room,  date):
+    if not hasattr(app, 'time_slots_frame') or app.time_slots_frame is None:
+        app.time_slots_frame = ctk.CTkFrame(app, width=200, height=300)
+        app.time_slots_frame.place(relx=0.5, rely=0.5, anchor="w")
 
-        ctk.CTkLabel(frame, text=room, anchor="w").pack(anchor="w", padx=10, pady=(10, 5))
+    for child in app.time_slots_frame.winfo_children():
+        child.destroy()
 
-        ctk.CTkButton(
-            frame,
-            text="Book This Room",
-            width=160,
-            command=lambda r=room: handle_room_click(r)
-        ).pack(pady=(0, 10), anchor="e")
+    header = ctk.CTkLabel(app.time_slots_frame, text=f"Slots for {date.isoformat()}")
+    header.pack(pady=(8, 6))
+
+    # Hard Coded Room Availability TODO: Wait for backend implementation
+    slots = [f"{h:02d}:00 - {h+1:02d}:00" for h in range(9, 17)]
+
+    for slot in slots:
+        btn = ctk.CTkButton(app.time_slots_frame, text=slot, width=160, height=30,
+                            command=lambda s=slot, d=date: select_time_slot(app, "timeslots",d, s, room_id=room))
+        btn.pack(padx=10, pady=4)

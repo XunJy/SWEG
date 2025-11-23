@@ -55,11 +55,11 @@ class LoginUI(ctk.CTkFrame):
                     widget.destroy()
             if username == "":
                 ctk.CTkLabel(self, text="Login Failed: Username cannot be empty", text_color="red").grid(row=6, column=0, columnspan=2, pady=(0,10))
-            elif error_message == "Invalid Username":
+            elif error_message == "User not found":
                 ctk.CTkLabel(self, text="Login Failed: User not found", text_color="red").grid(row=6, column=0, columnspan=2, pady=(0,10))
             elif password == "":
                 ctk.CTkLabel(self, text="Login Failed: Password cannot be empty", text_color="red").grid(row=6, column=0, columnspan=2, pady=(0,10))
-            elif error_message == "Incorrect Password":
+            elif error_message == "Incorrect password":
                 ctk.CTkLabel(self, text="Login Failed: Incorrect password", text_color="red").grid(row=6, column=0, columnspan=2, pady=(0,10))
             else:
                 ctk.CTkLabel(self, text=f"Login Failed: {error_message}", text_color="red").grid(row=6, column=0, columnspan=2, pady=(0,10))

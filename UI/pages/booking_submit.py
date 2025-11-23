@@ -43,10 +43,10 @@ def select_time_slot(app, caller, date, slot_text, room_id=None):
         row=2, column=0, columnspan=2, pady=20
     )
 
-def back_button_to_booking_date(app, room_id, date):
-    from UI.pages.booking_by_date import show_booking_date, on_calendar_selected, show_time_slots_for_date
+def back_button_to_booking_room(app, room_id, date):
+    from UI.pages.booking_by_room import show_booking_room, on_calendar_selected, show_time_slots_for_date
 
-    show_booking_date(app)
+    show_booking_room(app)
     app.room_select.set(room_id)
     app.calander.place(relx=0.5, rely=0.5, anchor="e")
     app.calander.config(state="normal") 
@@ -59,9 +59,9 @@ def back_button_to_booking_date(app, room_id, date):
     app.time_slots_frame.place(relx=0.5, rely=0.5, anchor="w")
     show_time_slots_for_date(app, room_id, date)
 
-def back_button_to_booking_room(app, date, time_slot):
-    from UI.pages.booking_by_room import show_booking_room
-    show_booking_room(app)
+def back_button_to_booking_date(app, date, time_slot):
+    from UI.pages.booking_by_date import show_booking_date
+    show_booking_date(app)
     app.date_picker.set_date(date)
     hour, minute = map(int, time_slot.split(" - ")[0].split(":"))
     ampm = "AM"

@@ -1,8 +1,8 @@
 import customtkinter as ctk
 from UI.pages.events_page import show_events, show_my_events
 from UI.pages.invites_page import show_invites
-from UI.pages.booking_by_date import show_booking_date
 from UI.pages.booking_by_room import show_booking_room
+from UI.pages.booking_by_date import show_booking_date
 from UI.pages.bookings_page import show_my_bookings
 from UI.components.theme import change_theme
 

@@ -70,22 +70,34 @@ if __name__ == "__main__":
 
     app = MainUI(main_app)
 
+    login_screen = None
+
     def login_success(user_id):
-        login_screen.destroy()
+        global login_screen
+        if login_screen is not None and login_screen.winfo_exists():
+            login_screen.destroy()
         app.burger_menu_button.configure(state="normal")
         app.user_id = user_id
         show_events(app)
 
-    login_screen = ctk.CTkToplevel(main_app)
-    login_screen.geometry("400x400")
-    login_screen.title("Login")
+    def show_login():
+        global login_screen
+        if login_screen is not None and login_screen.winfo_exists():
+            login_screen.lift()
+        else:
+            login_screen = ctk.CTkToplevel(main_app)
+            login_screen.geometry("400x400")
+            login_screen.title("Login")
+            LoginUI(login_screen, on_success=login_success)
+            login_screen.focus_force()
+            login_screen.grab_set()  
+            login_screen.attributes("-topmost", True)
+            login_screen.after(300, lambda: login_screen.attributes("-topmost", False))
 
-    LoginUI(login_screen, on_success=login_success)
+    button = ctk.CTkButton(app, text="Login", command=show_login)
+    button.pack( pady=20)
 
-    login_screen.focus_force()
-    login_screen.grab_set()  
-    login_screen.attributes("-topmost", True)
-    login_screen.after(300, lambda: login_screen.attributes("-topmost", False))
+    show_login()
 
-    # login_success()
     main_app.mainloop()
+

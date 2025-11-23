@@ -71,7 +71,6 @@ def handle_account_creation(app, first_name, last_name, email, password, confirm
     # TODO: Waiting on Backend to implement account creation logic
     confirm_password = pwd.hash_password(confirm_password)
     if pwd.check_password(confirm_password, password) is False:
-        print("Fails")
         ctk.CTkLabel(
             app,
             text="Account Creation Failed: Passwords do not match",

@@ -25,7 +25,7 @@ uvicorn app.api.server:app --reload --host 0.0.0.0 --port 8080
 ### 1.3 - Running the UI Client
 Please Ensure the Server is running before connecting the client
 From Root Directory, Run the main UI as a package module as so:
-```
+```bash
 python -m UI.main_ui
 ```
 
