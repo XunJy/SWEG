@@ -1,5 +1,4 @@
 import customtkinter as ctk
-import tkinter as tk
 import requests
 from UI.components.clear_contents import clear_contents
 from UI.pages.event_details_page import view_event_details, accept_invite, decline_invite
@@ -52,7 +51,7 @@ def show_invites(app):
             height=28,
             fg_color="#33cc33",
             hover_color="#00cc00",
-            command=lambda id=invite_id: accept_invite(app, id)
+            command=lambda i=invite_id, b=booking_id: accept_invite(app, i, b)
         ).pack(side="right", padx=5)
 
         ctk.CTkButton(
@@ -62,7 +61,7 @@ def show_invites(app):
             height=28,
             fg_color="#cc3333",
             hover_color="#990000",
-            command=lambda id=invite_id: decline_invite(app, id)
+            command=lambda i=invite_id, b=booking_id: decline_invite(app, i, b)
         ).pack(side="right", padx=5)
 
         ctk.CTkButton(
@@ -72,5 +71,5 @@ def show_invites(app):
             height=28,
             fg_color="#0078D7",
             hover_color="#005A9E",
-            command=lambda id=invite_id: view_event_details(app, id, caller="invites")
+            command=lambda b=booking_id, i=invite_id: view_event_details(app, b, caller="invites", invite_id=i)
         ).pack(side="right", padx=5)
